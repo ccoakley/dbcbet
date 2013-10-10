@@ -28,7 +28,7 @@ def x_non_negative(self):
     return self.x >= 0
 
 # a finitization
-def finitize_test_class():
+def finitize_example_class():
     return {'x':[-1,0,1,2]}
 
 # Pete: this seems like a typical case. Maybe the finitization should just be the returned hash, and not a function.
@@ -39,8 +39,8 @@ def finitize_test_class():
 
 # applying invariant to class, precondition and postconditions to the method
 @inv(x_non_negative)
-@finitize(finitize_test_class)
-class TestClass:
+@finitize(finitize_example_class)
+class ExampleClass:
     def __init__(self):
         self.x = 0
     
@@ -55,32 +55,8 @@ class TestClass:
     
 # Tests
 
-# def testEnumerate():
-#     class Foo(object):
-#         pass
-#     ob = Foo()
-#     ob._finitization_field_set={"a":[-1,0,1], "b":['aa','bb','cc','dd'], "c":[-5]}
-#     for vals in enumerate(ob):
-#         print vals
-#         #    for vals in enumerate(ob):
-#         #print vals
-
-# def test1():
-#     t = TestClass()
-#     try:
-#         t.do_something(1,2)
-#     except ContractViolation as e:
-#         print e.value
-#     t.do_something(2,1)
-#     print t.x
-#     try:
-#         t.do_something(-1,2)
-#     except ContractViolation as e:
-#         print e.value
-#     print "done"
-
 def test_bet():
-    bet(TestClass).run()
+    bet(ExampleClass).run()
 
 #
 # A more complicated test with inheritance
@@ -120,7 +96,7 @@ def sub_class_method_post2(self, old, ret, a):
 class TestBaseClass(object):
     @pre(base_class_method_pre)
     @post(base_class_method_post)
-    def test_method(self, a):
+    def a_method(self, a):
         self.x = a
 
 @inv(sub_class_inv)
@@ -130,23 +106,23 @@ class TestSubClass(TestBaseClass):
     @post(sub_class_method_post)
     @post(sub_class_method_post2)
     @finitize_method(range(-1,10))
-    def test_method(self, a):
+    def a_method(self, a):
         self.x = a+1
 
 def test_inheritance():
     bet(TestSubClass).run()
     print "Individual Tests"
-    test_explicit_success(TestSubClass, -1)
-    test_explicit_fail(TestSubClass, 0)
-    test_explicit_fail(TestSubClass, 1)
-    test_explicit_success(TestSubClass, 2)
-    test_explicit_success(TestSubClass, 3)
-    test_explicit_success(TestSubClass, 4)
-    test_explicit_fail(TestSubClass, 5)
-    test_explicit_fail(TestSubClass, 6)
-    test_explicit_success(TestSubClass, 7)
-    test_explicit_fail(TestSubClass, 8)
-    test_explicit_success(TestSubClass, 9)
+    explicit_success(TestSubClass, -1)
+    explicit_fail(TestSubClass, 0)
+    explicit_fail(TestSubClass, 1)
+    explicit_success(TestSubClass, 2)
+    explicit_success(TestSubClass, 3)
+    explicit_success(TestSubClass, 4)
+    explicit_fail(TestSubClass, 5)
+    explicit_fail(TestSubClass, 6)
+    explicit_success(TestSubClass, 7)
+    explicit_fail(TestSubClass, 8)
+    explicit_success(TestSubClass, 9)
 
 def test_solo_composition():
     test_only_pre()
@@ -156,53 +132,52 @@ def test_solo_composition():
 class TestOnlyPre(object):
     @pre(sub_class_method_pre)
     @pre(sub_class_method_pre2)
-    def test_method(self, a):
+    def a_method(self, a):
         self.x = a+1
 
 def test_only_pre():
-    test_explicit_fail(TestOnlyPre, 4)
-    test_explicit_success(TestOnlyPre, 5)
-    test_explicit_fail(TestOnlyPre, 7)
+    explicit_fail(TestOnlyPre, 4)
+    explicit_success(TestOnlyPre, 5)
+    explicit_fail(TestOnlyPre, 7)
         
 class TestOnlyPost(object):
     @post(sub_class_method_post)
     @post(sub_class_method_post2)
-    def test_method(self, a):
+    def a_method(self, a):
         self.x = a+1
 
 def test_only_post():
-    test_explicit_fail(TestOnlyPost, 6)
-    test_explicit_success(TestOnlyPost, 7)
-    test_explicit_fail(TestOnlyPost, 8)
+    explicit_fail(TestOnlyPost, 6)
+    explicit_success(TestOnlyPost, 7)
+    explicit_fail(TestOnlyPost, 8)
 
 @inv(base_class_inv)
 @inv(sub_class_inv)
 class TestOnlyInv(object):
-    def test_method(self, a):
+    def a_method(self, a):
         self.x = a+1
 
 def test_only_inv():
-    test_explicit_success(TestOnlyInv, -1)
-    test_explicit_fail(TestOnlyInv, 0)
-    test_explicit_fail(TestOnlyInv, 1)
-    test_explicit_success(TestOnlyInv, 2)
+    explicit_success(TestOnlyInv, -1)
+    explicit_fail(TestOnlyInv, 0)
+    explicit_fail(TestOnlyInv, 1)
+    explicit_success(TestOnlyInv, 2)
 
-def test_explicit_fail(class_, val):
+def explicit_fail(class_, val):
     t = class_()
     try:
-        t.test_method(val)
-        print str(val) + " worked, should have failed"
+        t.a_method(val)
+        assert False, str(val) + " worked, should have failed"
     except ContractViolation as cv:
-        print str(val) + " failed, as expected"
+        assert True
 
-def test_explicit_success(class_, val):
+def explicit_success(class_, val):
     t = class_()
     try:
-        t.test_method(val)
-        print str(val) + " worked, as expected"
+        t.a_method(val)
+        assert True
     except ContractViolation as cv:
-        print cv
-        print str(val) + " failed, should have worked"
+        assert False, str(val) + " failed, should have worked: " + str(cv)
 
 class GoodException(Exception):
     pass
@@ -313,55 +288,6 @@ def test_throws():
     except ThrowsViolation:
         print "Translating BadException to ThrowsViolation worked"
     
-#
-# A structural recursion test
-#
-
-# def no_cycles(self):
-#     def recurse(node, visited):
-#         if node.left is None and node.right is None:
-#             return True
-#         if node.left in visited:
-#             return False
-#         elif node.left is not None:
-#             visited.append(node.left)
-#             if not recurse(node.left, visited):
-#                 return False
-#         if node.right in visited:
-#             return False
-#         elif node.right is not None:
-#             visited.append(node.right)
-#             if not recurse(node.right, visited):
-#                 return False
-#         return True
-#     return recurse(self, [])
-
-# def test_no_cycles():
-#     a = TestBinaryNode()
-#     b = TestBinaryNode()
-#     a.left = b
-#     b.right = a
-#     print no_cycles(a)
-
-# def binary_node_finitization():
-#     return {'left':TestBinaryNode, 'right':TestBinaryNode}
-
-# @inv(no_cycles)
-# @finitize(binary_node_finitization)
-# class TestBinaryNode(object):
-#     def __init__(self):
-#         self.left = None
-#         self.right = None
-
-# def test_structural_recursion():
-#     bet(TestBinaryNode).run()
-
-
-#     import inspect
-#     import sys
-#     classname = inspect.getouterframes(inspect.currentframe())[1][3]
-
-# this is how python does main, just so you can see the stuff in action
 if __name__ == "__main__":
     test_inheritance()
     test_throws()
