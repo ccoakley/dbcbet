@@ -19,7 +19,7 @@ In Bounded Exhaustive Testing (BET), the combinatoric explosiveness of exhaustiv
 methods that enumerate a subset of an object's set of field values. 
 While extant research on BET notes that DbC facilitates automated testing, DbC and BET are distinct concepts. 
 We extend DbC to optionally include finitization, synergistically integrating DbC and BET. 
-Unit testing is transformed from four procedural tasks:
+Unit testing is transformed from four <i>procedural</i> tasks:
 
 <ol>
 <li>initialize object states,</li>
@@ -28,6 +28,6 @@ Unit testing is transformed from four procedural tasks:
 <li>compare returned values and resultant state with expected values and state</li>
 </ol>
 
-to two declarative tasks: define contracts and enumerate inputs of interest.
+to two <i>declarative tasks</i>: define contracts and enumerate inputs of interest.
 
 Performance experiments are presented. 
