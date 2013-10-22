@@ -22,12 +22,11 @@ We extend DbC to optionally include finitization, synergistically integrating Db
 Unit testing is transformed from four procedural tasks:
 
 <ol>
-<li>
-1) initialize object states,</li>
+<li>initialize object states,</li>
+<li>generate method inputs,</li>
+<li>invoke an object's methods, and</li>
+<li>compare returned values and resultant state with expected values and state</li>
 </ol>
-2) generate method inputs,
-3) invoke an object's methods, and
-4) compare returned values and resultant state with expected values and state
 
 to two declarative tasks: define contracts and enumerate inputs of interest.
 
