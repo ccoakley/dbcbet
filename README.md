@@ -1,7 +1,7 @@
 dbcbet
 ======
 
-Design by Contract with declarative Bounded Exhaustive Testing
+Design by Contract with Declarative Bounded Exhaustive Testing
 
 Design-by-Contract (DbC) is a language feature introduced in Eiffel. 
 Though object-oriented, contracts are orthogonal to its type system: 
@@ -21,7 +21,10 @@ While extant research on BET notes that DbC facilitates automated testing, DbC a
 We extend DbC to optionally include finitization, synergistically integrating DbC and BET. 
 Unit testing is transformed from four procedural tasks:
 
-1) initialize object states,
+<ol>
+<li>
+1) initialize object states,</li>
+</ol>
 2) generate method inputs,
 3) invoke an object's methods, and
 4) compare returned values and resultant state with expected values and state
