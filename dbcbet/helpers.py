@@ -64,4 +64,4 @@ class argument_types:
 
 def immutable(self, old, ret, *args, **kwargs):
     """Object immutability was violated by the method call (did you forget to override __eq__?)"""
-    return old == self 
+    return old.self == self 

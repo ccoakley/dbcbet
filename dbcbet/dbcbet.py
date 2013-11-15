@@ -13,6 +13,7 @@ signature of the method they apply to
 """
 
 class inv(object):
+    """A callable object (decorator) which attaches an invariant to a class"""
     def __get__(self, instance, owner):
         from types import MethodType
         return MethodType(self, instance, owner)
@@ -93,14 +94,13 @@ def create_invoker(method):
     def wrapped_method(s, *args, **kwargs):
         check_preconditions(wrapped_method, s, *args, **kwargs)
 
-        # A deep copy of the object is created for the postcondition
-        import copy
-        old = copy.deepcopy(s)
+        # A deep copy of the object and arguments are created for the postcondition
+        o = old(method, s, args, kwargs)
 
         try:
             ret = method(s, *args, **kwargs)
             
-            check_postconditions(wrapped_method, s, old, ret, *args, **kwargs)
+            check_postconditions(wrapped_method, s, o, ret, *args, **kwargs)
             check_invariants(wrapped_method, s, *args, **kwargs)
         except Exception as ex:
             if check_throws(wrapped_method, ex, s, *args, **kwargs):
@@ -111,7 +111,7 @@ def create_invoker(method):
     return wrapped_method
 
 def dbc(clazz):
-    """Applies the inheritance of a contract without applying an invariant"""
+    """A callable object (decorator) which applies the inheritance of a contract without applying an invariant"""
     ensure_invoker(clazz)
     inherit_contract(clazz)
     return clazz
@@ -197,7 +197,8 @@ def inherit_method_contract_components_from(clazz, baseclass):
 #
 
 def is_public(methodname):
-    """Determines if a method is public by looking for leading underscore
+    """Determines if a method is public by looking for leading underscore.
+    
     pseudo-public methods are skipped"""
     return methodname[0] != "_" or methodname == "__str__" or methodname == "__init__" or methodname == "__eq__" or methodname == "__hash__"
 
@@ -207,6 +208,7 @@ def is_public(methodname):
 #
 
 class ContractViolation(Exception):
+    """Base class for all contract violation classes"""
     def __init__(self, message):
         self.message = message
 
@@ -244,7 +246,7 @@ class PostconditionViolation(ContractViolation):
         self.kwargs = kwargs
 
     def __str__(self):
-        outstring = "Postcondition Violation: Instance of %s with initialization failed when calling %s with arguments (%s), keywords %s, old value: %s, return: %s. Contract: %s" % (self.instance.__class__.__name__, self.method.__name__, ', '.join(map(str,self.args)), self.kwargs, self.old, self.ret, self.predicate_string(self.predicate))
+        outstring = "Postcondition Violation: Instance of %s with initialization failed when calling %s with arguments (%s), keywords %s, old values: %s, return: %s. Contract: %s" % (self.instance.__class__.__name__, self.method.__name__, ', '.join(map(str,self.args)), self.kwargs, self.old, self.ret, self.predicate_string(self.predicate))
         return outstring
 
 class InvariantViolation(ContractViolation):
@@ -271,36 +273,8 @@ class ThrowsViolation(ContractViolation):
         outstring = "Throws Violation: Instance of %s failed when calling %s with arguments (%s), keywords %s. Threw %s" % (self.instance.__class__.__name__, self.method.__name__, ', '.join(map(str, self.args)), self.kwargs, str(type(self.exception)))
         return outstring
 
-# def describe_contract(clazz):
-#     """Debug aid for listing contract components on a class"""
-#     if hasattr(clazz, "_invariant"):
-#         print clazz.__name__ + " has an invariant:"
-#         print clazz._invariant
-#     else:
-#         print clazz.__name__ + " has no invariant"        
-#     import inspect
-#     mets = inspect.getmembers(clazz, predicate=inspect.ismethod)
-#     for key, val in mets:
-#         describe_pre(clazz, key, val)
-#         describe_post(clazz, key, val)
-
-# def describe_pre(clazz, methodname, method):
-#     """Debug aid for preconditions used by describe_contract"""
-#     if hasattr(method, "_precondition"):
-#         print methodname + " has a precondition:"
-#         print method._precondition
-#     else:
-#         print methodname + " has no precondition"
-
-# def describe_post(clazz, methodname, method):
-#     """Debug aid for postconditions used by describe_contract"""
-#     if hasattr(method, "_postcondition"):
-#         print methodname + " has a postcondition:"
-#         print method._postcondition
-#     else:
-#         print methodname + " has no postcondition"
-
 class throws(object):
+    """A callable object (decorator) which attaches an allowable exception type to a method"""
     def __get__(self, instance, owner):
         from types import MethodType
         return MethodType(self, instance, owner)
@@ -342,6 +316,7 @@ class throws(object):
         return self.exceptions
 
 class pre(object):
+    """A callable object (decorator) which attaches a precondition to a method"""
     def __get__(self, instance, owner):
         from types import MethodType
         return MethodType(self, instance, owner)
@@ -382,6 +357,7 @@ class pre(object):
             method._final_pre = True
 
 class post(object):
+    """A callable object (decorator) which attaches a postcondition to a method"""
     def __get__(self, instance, owner):
         from types import MethodType
         return MethodType(self, instance, owner)
@@ -413,6 +389,18 @@ class post(object):
             return method._postcondition
         return self.postcondition
 
+class old(object):
+    """A nicer interface for old in postconditions"""
+    def __init__(self, method, s, args, kwargs):
+        """Performs a deep copy of self (s, not the current old-self), args, and kwargs"""
+        import copy
+        self.self = copy.deepcopy(s)
+        self.args = copy.deepcopy(args)
+        self.kwargs = copy.deepcopy(kwargs)
+
+    def __repr__(self):
+        return "old(self=%s,args=%s,kwargs=%s)" % (self.self, self.args, self.kwargs)
+    
 #
 # Bounded exhaustive testing support
 #
