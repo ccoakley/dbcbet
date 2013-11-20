@@ -64,8 +64,16 @@ class argument_types:
         self.typelist = typelist
         self.msg = "implementation error in argument_types"
 
+    def _str_to_class(self, string):
+        import sys
+        return reduce(getattr, string.split("."), sys.modules[__name__])
+
     def __call__(self, s, *args, **kwargs):
         for typ, arg in zip(self.typelist, args):
+            if isinstance(typ, str):
+                if isinstance(arg, self._str_to_class(typ)) and arg is not None:
+                    self.msg = "argument %s was not of type %s" % (arg, typ)
+                    return False
             if not isinstance(arg, typ) and arg is not None:
                 self.msg = "argument %s was not of type %s" % (arg, typ.__name__)
                 return False

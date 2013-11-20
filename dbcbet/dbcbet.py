@@ -489,7 +489,7 @@ class bet(object):
         self.running_log.append("instance of %s with initialization %s failed when calling %s with arguments %s. Reason: %s" % (candidate.__class__.__name__, fs, val.__name__, ', '.join(map(str,args)), cv))
 
     def log_precondition_not_found(self, val):
-        self.running_log.append("No precondition found when attempting to call %s" (val.__name__))
+        self.running_log.append("No precondition found when attempting to call %s" % (val.__name__))
 
     def call_method(self, candidate, fs, val):
         for args in enumerate_args(val._bet_arguments, self.arg_scope):
