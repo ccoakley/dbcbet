@@ -39,12 +39,24 @@ def args(*arglist):
         return True
     return positional_predicate
 
-def _not(predicate):    
+def not_(predicate):    
     """DBC helper for negating reusable, simple predicates used in preconditions, postconditions, and invariants"""
     @wraps(predicate)
     def negated_predicate(*args, **kwargs):
         return not predicate(*args, **kwargs)
     return negated_predicate
+
+def or_(predicate1, predicate2):
+    """DBC helper for disjunction of predicates"""
+    def or_predicates(*args, **kwargs):
+        return predicate1(*args, **kwargs) or predicate2(*args, **kwargs)
+    return or_predicates
+
+def and_(predicate1, predicate2):
+    """DBC helper for conjunction of predicates"""
+    def and_predicates(*args, **kwargs):
+        return predicate1(*args, **kwargs) and predicate2(*args, **kwargs)
+    return and_predicates
 
 class argument_types:
     """DBC helper for reusable, simple predicates for argument-type tests used in preconditions"""

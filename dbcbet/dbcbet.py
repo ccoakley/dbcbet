@@ -88,7 +88,7 @@ def check_throws(wrapped_method, ex, s, *args, **kwargs):
     raise ThrowsViolation(ex, s, wrapped_method.__wrapped__, args, kwargs)
 
 def create_invoker(method):
-    """One wrapper checks all contract components and invokes the meethod."""
+    """One wrapper checks all contract components and invokes the method."""
     from functools import wraps
     @wraps(method)
     def wrapped_method(s, *args, **kwargs):
@@ -105,6 +105,7 @@ def create_invoker(method):
         except Exception as ex:
             if check_throws(wrapped_method, ex, s, *args, **kwargs):
                 raise
+        return ret
 
     wrapped_method.__wrapped__ = method
     wrapped_method._invoker_exists = True
