@@ -29,5 +29,3 @@ Unit testing is transformed from four <i>procedural</i> tasks:
 </ol>
 
 to two <i>declarative tasks</i>: define contracts and enumerate inputs of interest.
-
-Performance experiments are presented. 
