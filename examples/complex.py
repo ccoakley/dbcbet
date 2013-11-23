@@ -1,4 +1,14 @@
-from dbcbet.dbcbet import dbc, pre, post, inv, bet, finitize, finitize_method
+"""Complex number example.
+
+This was ported from a JML example illustrating design by
+contract. The code is redundant in places, which should not be typical
+use. For example, if the specification for a method (postcondition)
+looks like the implementation, it shouldn't actually be used. Throw
+that postcondition away, as there's no justification for redundant code.
+"""
+
+
+from dbcbet.dbcbet import dbc, pre, post, inv, bet, finitize, finitize_method, throws
 from dbcbet.helpers import argument_types
 import math
 from numbers import Number
@@ -47,7 +57,9 @@ def mul_post(self, old, ret, b):
     if math.isnan(self._magnitude() * b._magnitude()) or math.isnan(self._angle()) or math.isnan(b._angle()):
         return math.isnan(ret._real_part()) and ret._imaginary_part() == 0.0
     else:
-        return ret is not None and approx_equal(self._magnitude() * b._magnitude(), ret._magnitude(), tolerance) and approx_equal(standardize_angle(self._angle() + b._angle()), ret._angle(), tolerance)
+        return (ret is not None 
+                and approx_equal(self._magnitude() * b._magnitude(), ret._magnitude(), tolerance) 
+                and approx_equal(standardize_angle(self._angle() + b._angle()), ret._angle(), tolerance))
 
 def div_post(self, old, ret, b):
     if math.isnan(self._magnitude() / b._magnitude()) or math.isnan(self._angle()) or math.isnan(b._angle()):
@@ -70,7 +82,7 @@ def finitize_polar():
     return {'mag':[-1,0,1],'ang':[-math.pi,0,math.pi/4.0,math.pi/2.0]}
 
 def finitize_rectangular():
-    return {'re':[-1,0,1],'img':[-1,0,1]}
+    return {'re':xrange(-2,80),'img':[-1,0,1]}
 
 def standardize_angle(rad):
     if math.isnan(rad) or math.isinf(rad):
@@ -141,31 +153,9 @@ class ComplexOps(Complex):
 @inv(polar_invariant)
 @finitize(finitize_polar)
 class Polar(ComplexOps):
-    #    """    /** Initialize this polar coordinate number
-    #* with magnitude mag and angle ang, except that
-    #* when the magnitude is negative, this
-    #* is interpreted as magnitude -mag and angle ang+StrictMath.PI.
-    #* @param mag the magnitude desired
-    #* @param ang the angle in radians, measured
-    #*            counterclockwise from the positive x axis
-    # */
-    #/*@   requires mag >= 0 && Double.NEGATIVE_INFINITY < ang
-    #  @         && ang < Double.POSITIVE_INFINITY;
-    #  @   ensures this.magnitude() == mag;
-    #  @   ensures this.angle() == standardizeAngle(ang);
-    #  @ also
-    #  @   requires mag < 0 && Double.NEGATIVE_INFINITY < ang
-    #  @         && ang < Double.POSITIVE_INFINITY;
-    #  @   ensures this.magnitude() == - mag;
-    #  @   ensures this.angle() == standardizeAngle(ang+StrictMath.PI);
-    #  @ also
-    #  @   requires Double.isNaN(mag) || Double.isNaN(ang)
-    #  @            || Double.NEGATIVE_INFINITY == ang
-    #  @            || ang == Double.POSITIVE_INFINITY;
-    #  @   signals_only IllegalArgumentException;
-    #  @*/"""
     @pre(argument_types(Number, Number))
     @finitize_method([-1,0,1],[-math.pi,0,math.pi/4.0,math.pi/2.0])
+    @throws(ValueError)
     def __init__(self, mag, angle):
         if math.isnan(mag):
             raise ValueError()
@@ -176,18 +166,7 @@ class Polar(ComplexOps):
         self.ang = standardize_angle(angle)
         
 
-#    """    /** Standardize the angle so it's between
-#     * -StrictMath.PI and StrictMath.PI (radians).
-#     */
-#    /*@   requires Double.NEGATIVE_INFINITY < rad
-#      @            && rad < Double.POSITIVE_INFINITY;
-#      @   ensures -StrictMath.PI <= \result && \result <= StrictMath.PI;
-#      @ also
-#      @   requires Double.isNaN(rad) || Double.NEGATIVE_INFINITY == rad
-#      @            || rad == Double.POSITIVE_INFINITY;
-#      @   signals_only IllegalArgumentException;
-#      @*/
-#      """
+    @throws(ValueError)
     def standardize_angle(self, rad):
         if math.isnan(rad) or math.isinf(rad):
             raise ValueError()
