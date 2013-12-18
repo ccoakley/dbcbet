@@ -95,16 +95,4 @@ class FullBinaryTree(object):
 
 if __name__ == "__main__":
     bet(FullBinaryTree).run()
-
-# java testcases
-# FullBinaryTree<Integer> tree1 = new FullBinaryTree<>( 1 );
-# FullBinaryTree<Integer> tree2 = new FullBinaryTree<>( 2 );
-# FullBinaryTree<Integer> tree3 = new FullBinaryTree<>( 3 );
-# FullBinaryTree<Integer> tree4 = new FullBinaryTree<>( 4 );
-# tree2.addSubtrees(  tree1, tree1 );
-# tree3.addSubtrees( tree2, tree1 );
-# tree4.addSubtrees( tree1, tree2 );
-# System.out.println( "tree1: " + tree1 );
-# System.out.println( "tree2: " + tree2 );
-# System.out.println( "tree3: " + tree3 );
-# System.out.println( "tree4: " + tree4 );
+    
