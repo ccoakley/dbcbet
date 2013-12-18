@@ -82,6 +82,6 @@ class argument_types:
     def error(self):
         return self.msg 
 
-def immutable(self, old, ret, *args, **kwargs):
-    """Object immutability was violated by the method call (did you forget to override __eq__?)"""
+def const(self, old, ret, *args, **kwargs):
+    """Object constness was violated by the method call (did you forget to override __eq__?)"""
     return old.self == self 
