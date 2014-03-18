@@ -31,10 +31,9 @@ def state(predicate):
 
 def args(*arglist):
     """DBC helper for reusable, simple predicates for argument-value tests used in preconditions"""
-    @wraps(predicate)
     def positional_predicate(s, *ar, **kw):
         for pred, arg in zip(arglist, ar):
-            if not pred(ar):
+            if not pred(arg):
                 return False
         return True
     return positional_predicate

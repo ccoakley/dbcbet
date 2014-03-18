@@ -12,6 +12,21 @@ signatures based on the type of contract component and on the
 signature of the method they apply to
 """
 
+"""TODO: reintroduce contract write braces and contract execution braces
+Global level for write and execute
+proposed syntax:
+
+global:
+dbcbet.contract.write(True) # or False
+dbcbet.contract.enforce(True) # or False
+
+granular:
+ClassName._contract.enforce(True)
+ClassName._contract.enforce(methodname, True)
+ClassName._contract.enforce(methodname, "pre", True) # pre, post, inv, and throws are valid for second param
+
+"""
+
 class inv(object):
     """A callable object (decorator) which attaches an invariant to a class"""
     def __get__(self, instance, owner):
