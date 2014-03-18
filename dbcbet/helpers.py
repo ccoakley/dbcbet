@@ -1,11 +1,10 @@
-
 """
 Helpers for reusable contract components.
 
 Now that we have preconditions, postconditions, and invariants, let us provide some abstractions:
 1. a "returns" predicate. This is a postcondition that tests the return value.
 2. an "args" predicate. This tests the parameters with additional predicates.
-3. an "immutable" predicate. This tests for immutability of self (old==self).
+3. a "const" predicate. This asserts that self is not mutated (old==self).
 
 Since some of those take additional predicates, some abstractions might be nice:
 1. nullable: allows null (or an additional test, passed in, such as nullable(positive)
